@@ -1,5 +1,6 @@
 package com.shopping.backend.controller;
 
+import com.shopping.backend.dto.LoginResponse;
 import com.shopping.backend.dto.RegisterRequest;
 import com.shopping.backend.service.AuthService;
 import jakarta.validation.Valid;
@@ -8,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import com.shopping.backend.dto.LoginRequest;
+import com.shopping.backend.model.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,18 +34,34 @@ public class AuthController {
         }
 
         try {
-            // 2. Success Flow
             String response = authService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
         } catch (RuntimeException e) {
-            // 3. Handle duplicate
+            // Handle duplicate
             return ResponseEntity.badRequest().body(e.getMessage());
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Registration failed, please try again later");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration failed, please try again later");
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body("Invalid input");
+        }
+
+        try {
+            // Returns Token + User
+            LoginResponse response = authService.login(request);
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            if ("User not found".equals(e.getMessage())) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            if ("Incorrect password".equals(e.getMessage())) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

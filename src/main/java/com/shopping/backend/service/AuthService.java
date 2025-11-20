@@ -6,6 +6,8 @@ import com.shopping.backend.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.shopping.backend.util.Jwt;
+import com.shopping.backend.dto.LoginResponse;
 
 @Service
 public class AuthService {
@@ -15,6 +17,8 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private Jwt jwt;
 
     public String register(RegisterRequest request) {
         // Check username/email exist
@@ -25,7 +29,6 @@ public class AuthService {
             throw new RuntimeException("Email already exists");
         }
 
-        // Make user entity
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -35,10 +38,25 @@ public class AuthService {
         // Force role to customer
         user.setRole("customer");
 
-        // Hash Password
+        // Hash
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
 
         return "Account created successfully";
+    }
+
+    public LoginResponse login(com.shopping.backend.dto.LoginRequest request) {
+        User user = userRepository.findByUsernameOrEmail(request.getIdentifier(), request.getIdentifier())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Incorrect password");
+        }
+
+        // GENERATE TOKEN
+        String token = jwt.generateToken(user.getUsername());
+
+        // Return Token AND User
+        return new LoginResponse(token, user);
     }
 }
