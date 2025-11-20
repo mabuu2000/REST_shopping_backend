@@ -3,6 +3,7 @@ package com.shopping.backend.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -19,9 +20,10 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    private String password;
+    @JsonIgnore
+    private String password; // Not return pass
 
-    private String role; // "customer", "staff", "ceo"
+    private String role; // customer, staff, ceo
 
     @Column(name = "full_name")
     private String fullName;
