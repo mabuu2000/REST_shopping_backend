@@ -7,5 +7,6 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
-    // .findAll() is already provided by JpaRepository, no @Query needed.
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }
