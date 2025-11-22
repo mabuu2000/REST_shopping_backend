@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class CardRequest {
-    @Pattern(regexp = "^\\d{16}$", message = "Card number must be 16 digits")
+    @Pattern(regexp = "^\\d{16}$", message = "Card number must be 16 digits and be numbers")
     private String cardNumber;
 
     @Pattern(regexp = "^(0[1-9]|1[0-2])\\/\\d{2}$", message = "Expiry must be MM/YY")
