@@ -10,10 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService { // It is a class, NOT an interface
+public class UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -21,7 +22,6 @@ public class UserService { // It is a class, NOT an interface
     @Autowired
     private AddressRepository addressRepository;
 
-    // view account
     public AccountResponse getAccountInfo(String username) {
         User user = userRepository.findByUsernameOrEmail(username, username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -35,14 +35,14 @@ public class UserService { // It is a class, NOT an interface
         response.setPhoneNumber(user.getPhoneNumber());
         response.setRole(user.getRole());
 
-        response.setAddresses(addresses.stream()
-                .map(Address::getAddressText)
-                .collect(Collectors.toList()));
+        List<AccountResponse.AddressDto> addressDtos = addresses.stream()
+                .map(addr -> new AccountResponse.AddressDto(addr.getId(), addr.getAddressText()))
+                .collect(Collectors.toList());
 
+        response.setAddresses(addressDtos);
         return response;
     }
 
-    // update account
     public AccountResponse updateAccount(String username, UpdateAccountRequest request) {
         User user = userRepository.findByUsernameOrEmail(username, username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -60,5 +60,16 @@ public class UserService { // It is a class, NOT an interface
         }
 
         return getAccountInfo(username);
+    }
+
+    public void deleteAddress(String username, UUID addressId) {
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RuntimeException("Address not found"));
+
+        if (!address.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Unauthorized to delete this address");
+        }
+
+        addressRepository.delete(address);
     }
 }
