@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/account")
 public class AccountController {
@@ -34,5 +36,12 @@ public class AccountController {
     public ResponseEntity<?> updateAccount(@Valid @RequestBody UpdateAccountRequest request) {
         String username = getCurrentUsername();
         return ResponseEntity.ok(userService.updateAccount(username, request));
+    }
+
+    @DeleteMapping("/address/{id}")
+    public ResponseEntity<String> deleteAddress(@PathVariable UUID id) {
+        String username = getCurrentUsername();
+        userService.deleteAddress(username, id);
+        return ResponseEntity.ok("Address deleted successfully");
     }
 }
