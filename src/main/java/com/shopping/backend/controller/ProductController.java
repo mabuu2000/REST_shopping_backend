@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -33,5 +34,31 @@ public class ProductController {
         }
 
         return ResponseEntity.ok(results);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> browseProducts(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice) {
+
+        // if min <0 then set null
+        if (minPrice != null && minPrice.compareTo(BigDecimal.ZERO) < 0) {
+            minPrice = null;
+        }
+        // same for max
+        if (maxPrice != null && maxPrice.compareTo(BigDecimal.ZERO) < 0) {
+            maxPrice = null;
+        }
+        // if min > max ignore max
+        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+            maxPrice = null;
+        }
+        List<Product> products = productService.browse(category, minPrice, maxPrice);
+        if (products.isEmpty()) {
+            return ResponseEntity.ok("No products found.");
+        }
+
+        return ResponseEntity.ok(products);
     }
 }
