@@ -33,4 +33,8 @@ public class Product {
     @OneToMany(mappedBy = "product")
     @JsonIgnoreProperties("product")
     private List<ProductMedia> media;
+
+    @OneToMany(mappedBy = "product")
+    @JsonIgnoreProperties("product")
+    private List<Review> reviews;
 }
