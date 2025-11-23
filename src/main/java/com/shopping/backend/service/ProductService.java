@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProductService {
@@ -20,5 +21,9 @@ public class ProductService {
 
     public List<Product> browse(String category, BigDecimal minPrice, BigDecimal maxPrice) {
         return productRepository.filterProducts(category, minPrice, maxPrice);
+    }
+
+    public Product getProductById(UUID id) {
+        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not available."));
     }
 }
