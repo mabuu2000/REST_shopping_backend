@@ -2,8 +2,10 @@ package com.shopping.backend.controller;
 
 import com.shopping.backend.model.Product;
 import com.shopping.backend.service.ProductService;
+import com.shopping.backend.service.WishlistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -16,6 +18,8 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private WishlistService wishlistService;
 
     @GetMapping("/search")
     public ResponseEntity<?> searchProducts(@RequestParam String keyword) {
@@ -72,6 +76,34 @@ public class ProductController {
             return ResponseEntity.status(404).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Unable to load product details.");
+        }
+    }
+
+    private String getCurrentUsername() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<String> likeProduct(@PathVariable UUID id) {
+        System.out.println("DEBUG: Reached Like Controller"); // Debugging line
+        String username = getCurrentUsername();
+        try {
+            String response = wishlistService.toggleLike(username, id);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // uc12: add to wishlist
+    @PostMapping("/{id}/wishlist")
+    public ResponseEntity<?> addProductToWishlist(@PathVariable UUID id) {
+        String username = getCurrentUsername();
+        try {
+            wishlistService.addToWishlist(username, id);
+            return ResponseEntity.ok("Product added to wishlist.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }
