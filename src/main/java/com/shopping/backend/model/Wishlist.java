@@ -20,4 +20,6 @@ public class Wishlist {
     @MapsId("productId")
     @JoinColumn(name = "product_id")
     private Product product;
+
+    private Integer quantity = 1;
 }
