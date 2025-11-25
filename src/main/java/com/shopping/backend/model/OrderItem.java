@@ -2,6 +2,7 @@ package com.shopping.backend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -9,7 +10,6 @@ import java.util.UUID;
 @Table(name = "order_items")
 @Data
 public class OrderItem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -23,6 +23,7 @@ public class OrderItem {
     private Product product;
 
     private Integer quantity;
-
-    private BigDecimal price;
+    
+    @Column(name = "price")
+    private BigDecimal priceAtPurchase;
 }
