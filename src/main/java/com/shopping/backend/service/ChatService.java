@@ -38,6 +38,6 @@ public class ChatService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         User otherUser = userRepository.findById(otherUserId)
                 .orElseThrow(() -> new RuntimeException("Other user not found"));
-        return messageRepository.findConversation(currentUser, otherUser);
+        return messageRepository.findConversationByUsers(currentUser, otherUser);
     }
 }
