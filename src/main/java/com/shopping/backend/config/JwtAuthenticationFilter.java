@@ -34,14 +34,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = null;
 
         // Check if header starts with "Bearer "
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
+        if (authHeader != null && authHeader.toLowerCase().startsWith("bearer ")) {
+            token = authHeader.substring(7).trim();
             try {
                 username = jwtUtil.extractUsername(token);
             } catch (Exception e) {
                 System.out.println("Token invalid");
             }
         }
+
 
         // authen
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
