@@ -34,7 +34,7 @@ public class CustomerRefundService {
         User user = userRepository.findByUsernameOrEmail(email, email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check order
+        // Check order existence
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -48,25 +48,35 @@ public class CustomerRefundService {
             throw new RuntimeException("Order not eligible for refund");
         }
 
-        // Check if already refunded
-        if (refundRepository.findByOrderId(order.getId()).isPresent()) {
+        // Check duplicate refund
+        if (refundRepository.findByOrder(order).isPresent()) {
             throw new RuntimeException("Refund already requested for this order");
         }
 
-        // Create refund record
+        refundRepository.findByOrder(order)
+                .ifPresent(r -> System.out.println("Refund FOUND -> ID = " + r.getId()));
+
+
+
+        // Create refund
         Refund refund = new Refund();
         refund.setOrder(order);
         refund.setReason(req.getReason());
         refund.setStatus("Pending");
 
         refundRepository.save(refund);
+        order.setStatus("Refunded");
+        orderRepository.save(order);
 
-        RefundResponse response = new RefundResponse();
-        response.setRefundId(refund.getId().toString());
-        response.setOrderId(orderId.toString());
-        response.setReason(req.getReason());
-        response.setStatus("Pending");
 
-        return response;
+        return new RefundResponse(
+                refund.getId().toString(),
+                orderId.toString(),
+                "Pending",
+                req.getReason()
+
+
+        );
     }
 }
+

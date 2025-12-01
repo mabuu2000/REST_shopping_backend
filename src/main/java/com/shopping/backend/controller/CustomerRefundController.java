@@ -26,7 +26,7 @@ public class CustomerRefundController {
             @PathVariable UUID orderId,
             @RequestBody RefundRequest req
     ) {
-        String email = AuthUtils.getCurrentUserEmail(); // KHÔNG sửa code cũ
+        String email = AuthUtils.getCurrentUserEmail();
 
         RefundResponse response = refundService.requestRefund(orderId, req, email);
 

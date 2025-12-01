@@ -13,11 +13,11 @@ public class Refund {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     private String reason;
 
-    private String status; // 'Pending', 'Approved'
+    private String status; // Pending / Approved
 }
