@@ -63,7 +63,6 @@ public class CeoReportService {
 
         // 4) Tạo object và lưu vào DB
         Report r = new Report();
-        r.setId(UUID.randomUUID());
         r.setCsvContent(csv.toString());
         r.setPdfContentBase64(null); // Nếu muốn tạo PDF, mình thêm sau
         r.setTimeFrame(timeFrame);
